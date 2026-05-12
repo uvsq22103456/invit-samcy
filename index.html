@@ -3,37 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Samia & Quincy</title>
+    <title>Invitation | Samia & Quincy</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-color: #0a0a0a; /* Noir très profond */
-            --text-main: #f5f5f5; /* Blanc cassé pour ne pas agresser les yeux */
-            --text-muted: #888888; /* Gris pour les textes secondaires */
+            --bg-color: #FAF8F5;
+            --text-dark: #2C2C2C;
+            --gold: #C5A880;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
         
         body { 
             font-family: 'Montserrat', sans-serif; 
             background-color: var(--bg-color); 
-            color: var(--text-main); 
-            line-height: 1.6;
-            overflow-x: hidden;
-            font-weight: 300;
+            color: var(--text-dark); 
+            /* Empêche de scroller tant que la porte est fermée */
+            overflow: hidden; 
+            height: 100vh;
         }
 
-        /* Typographie Serif pour les titres (façon magazine) */
-        h1, h2, h3, .serif-text { 
-            font-family: 'Playfair Display', serif; 
-            font-weight: 400; 
+        h1, h2, h3, .serif-text { font-family: 'Playfair Display', serif; font-weight: 400; }
+
+        /* =========================================
+           L'EFFET "PORTE QUI S'OUVRE"
+           ========================================= */
+        #door-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            z-index: 9999;
+            display: flex;
+            /* La perspective est cruciale pour l'effet 3D des portes qui s'ouvrent vers nous */
+            perspective: 1200px; 
+            background-color: #000;
         }
 
-        /* --- HERO SECTION (ACCUEIL) --- */
+        .door-panel {
+            width: 50%;
+            height: 100%;
+            /* J'ai mis une belle photo de porte sculptée type Haussmannien/Château */
+            background-image: url('https://images.unsplash.com/photo-1541198687258-c51d6db796e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+            /* L'astuce : on met la taille du fond à 200% pour que la photo prenne tout l'écran */
+            background-size: 200vw 100vh;
+            background-repeat: no-repeat;
+            transition: transform 2.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+            position: relative;
+        }
+
+        /* La porte gauche affiche la moitié gauche de l'image et pivote sur son bord gauche */
+        .left-door {
+            background-position: left center;
+            transform-origin: left center;
+            border-right: 2px solid rgba(0,0,0,0.3); /* Pour marquer la fente au milieu */
+        }
+
+        /* La porte droite affiche la moitié droite de l'image et pivote sur son bord droit */
+        .right-door {
+            background-position: right center;
+            transform-origin: right center;
+            border-left: 2px solid rgba(0,0,0,0.3);
+        }
+
+        /* Le texte d'instruction sur la porte */
+        .door-instruction {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            text-align: center;
+            z-index: 10000;
+            pointer-events: none; /* Pour que le clic passe à travers et touche la porte */
+            text-shadow: 0px 2px 10px rgba(0,0,0,0.8);
+            transition: opacity 0.5s ease;
+        }
+
+        .door-instruction p {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+        }
+
+        .door-instruction span {
+            display: block;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-family: 'Montserrat', sans-serif;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+
+        /* Classes ajoutées en Javascript quand on clique */
+        #door-overlay.open .left-door {
+            transform: rotateY(-110deg); /* S'ouvre vers la gauche */
+        }
+        
+        #door-overlay.open .right-door {
+            transform: rotateY(110deg); /* S'ouvre vers la droite */
+        }
+
+        #door-overlay.open .door-instruction {
+            opacity: 0; /* Le texte disparaît */
+        }
+
+        /* =========================================
+           LE CONTENU DU SITE (EN DESSOUS)
+           ========================================= */
+        #main-content {
+            opacity: 0;
+            transition: opacity 2s ease-in;
+            padding-bottom: 50px;
+        }
+
         .hero {
-            min-height: 100vh;
+            height: 60vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -42,210 +134,101 @@
             padding: 20px;
         }
 
-        .hero-img-container {
-            width: 100%;
-            max-width: 400px;
-            height: 50vh;
-            margin-bottom: 30px;
-            overflow: hidden;
-            border-radius: 4px; /* Léger arrondi très chic */
-        }
-
-        .hero-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            /* Image en noir et blanc pour l'exemple */
-            background: url('https://images.unsplash.com/photo-1606800052052-a08af7148866?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80') center/cover;
-            filter: grayscale(100%) contrast(120%);
-        }
-
         .hero-title {
-            font-size: clamp(2.5rem, 8vw, 4rem);
-            letter-spacing: 2px;
-            line-height: 1.2;
-            margin-bottom: 15px;
-            text-transform: uppercase;
+            font-size: clamp(3rem, 12vw, 5rem);
+            line-height: 1.1;
+            margin-bottom: 20px;
+            color: var(--text-dark);
         }
 
         .hero-date {
-            font-size: 1rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
             letter-spacing: 4px;
-            color: var(--text-muted);
+            color: var(--gold);
         }
 
-        /* --- SECTIONS COMMUNES --- */
-        section { 
-            padding: 80px 20px; 
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
+        section { padding: 40px 20px; text-align: center; }
+        .section-title { font-size: 2rem; margin-bottom: 30px; }
+        .intro-text { font-size: 1.1rem; line-height: 1.8; color: #555; }
 
-        .section-title {
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 40px;
-            color: var(--text-main);
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
-        }
+        /* Timeline simplifiée */
+        .timeline-item { margin-bottom: 40px; }
+        .time { font-size: 2.5rem; color: var(--gold); display: block; margin-bottom: 5px; }
+        .event-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
+        .event-desc { font-size: 0.95rem; color: #666; }
 
-        .intro-text {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* --- PROGRAMME (TIMELINE FAÇON VIDÉO) --- */
-        .programme-item {
-            margin-bottom: 60px;
-        }
-
-        .programme-time {
-            font-size: 4rem; /* Heures en TRES GROS, comme dans la vidéo */
-            line-height: 1;
-            margin-bottom: 10px;
-            color: var(--text-main);
-        }
-
-        .programme-title {
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
-        }
-
-        .programme-desc {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        /* --- DRESS CODE --- */
-        .dress-code-box {
-            border: 1px solid #333;
-            padding: 40px 20px;
-            margin-top: 20px;
-        }
-
-        .dress-code-title {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-        }
-
-        /* --- RSVP & BOUTONS --- */
-        .btn {
-            display: inline-block;
-            padding: 15px 40px;
-            background: transparent;
-            color: var(--text-main);
-            text-decoration: none;
-            border: 1px solid var(--text-main);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-size: 0.8rem;
-            transition: all 0.3s ease;
-            margin-top: 20px;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        .btn:hover {
-            background: var(--text-main);
-            color: var(--bg-color);
-        }
-
-        /* Animations douces */
-        .fade-in {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-        }
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
     </style>
 </head>
 <body>
 
-    <header class="hero">
-        <div class="hero-img-container fade-in">
-            <div class="hero-img"></div>
-        </div>
-        <h1 class="hero-title fade-in">Samia<br>& Quincy</h1>
-        <div class="hero-date fade-in">26 . 09 . 2026</div>
-    </header>
-
-    <section class="fade-in">
-        <h2 class="section-title">L'Invitation</h2>
-        <p class="intro-text">
-            Nous avons l'immense joie de vous convier à la célébration de notre mariage religieux. <br><br>
-            Une journée placée sous le signe de l'amour, que nous souhaitons partager avec nos familles et nos amis les plus proches.
-        </p>
-    </section>
-
-    <section class="fade-in">
-        <h2 class="section-title">Programme de la journée</h2>
+    <div id="door-overlay" onclick="openInvitation()">
+        <div class="door-panel left-door"></div>
+        <div class="door-panel right-door"></div>
         
-        <div class="programme-item fade-in">
-            <div class="programme-time serif-text">1400</div>
-            <div class="programme-title">Cérémonie Religieuse</div>
-            <div class="programme-desc">Accueil des invités et début de la célébration au Domaine du Château.</div>
+        <div class="door-instruction" id="instruction-text">
+            <p>S & Q</p>
+            <span>Appuyez pour ouvrir l'invitation</span>
         </div>
+    </div>
 
-        <div class="programme-item fade-in">
-            <div class="programme-time serif-text">1630</div>
-            <div class="programme-title">Vin d'Honneur</div>
-            <div class="programme-desc">Rafraîchissements et séance photo dans les jardins.</div>
-        </div>
+    <div id="main-content">
+        <header class="hero">
+            <span class="hero-date">26 Septembre 2026</span>
+            <h1 class="hero-title serif-text">Samia<br>&<br>Quincy</h1>
+        </header>
 
-        <div class="programme-item fade-in">
-            <div class="programme-time serif-text">1930</div>
-            <div class="programme-title">Repas de Noces</div>
-            <div class="programme-desc">Dîner festif et discours dans la grande salle.</div>
-        </div>
-    </section>
-
-    <section class="fade-in">
-        <div class="dress-code-box">
-            <h3 class="dress-code-title serif-text">Dress Code</h3>
+        <section>
+            <h2 class="section-title serif-text">L'Invitation</h2>
             <p class="intro-text">
-                Pour être en harmonie avec le thème de notre mariage, nous vous suggérons une tenue élégante. <br><br>
-                <strong>Thème : Noir & Or (All Black & Gold)</strong>
+                "Deux âmes, un seul cœur."<br><br>
+                Nous avons l'immense joie de vous convier à la célébration de notre mariage religieux au Domaine du Château.
             </p>
-        </div>
-    </section>
+        </section>
 
-    <section class="fade-in" style="margin-bottom: 50px;">
-        <h2 class="section-title">Présence</h2>
-        <p class="intro-text" style="margin-bottom: 30px;">
-            Merci de bien vouloir confirmer votre présence avant le 1er Mai 2026.
-        </p>
-        <a href="mailto:mariage@samiaquincy.fr" class="btn">Confirmer (RSVP)</a>
-    </section>
+        <section>
+            <h2 class="section-title serif-text">Le Programme</h2>
+            
+            <div class="timeline-item">
+                <span class="time serif-text">14h00</span>
+                <div class="event-title">Cérémonie</div>
+                <div class="event-desc">Début de la célébration solennelle.</div>
+            </div>
+
+            <div class="timeline-item">
+                <span class="time serif-text">16h30</span>
+                <div class="event-title">Vin d'Honneur</div>
+                <div class="event-desc">Rafraîchissements dans les jardins.</div>
+            </div>
+
+            <div class="timeline-item">
+                <span class="time serif-text">19h30</span>
+                <div class="event-title">Repas de Noces</div>
+                <div class="event-desc">Dîner festif dans la grande salle.</div>
+            </div>
+        </section>
+    </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.1 });
+        function openInvitation() {
+            const overlay = document.getElementById('door-overlay');
+            const mainContent = document.getElementById('main-content');
+            
+            // 1. On lance l'animation d'ouverture 3D
+            overlay.classList.add('open');
+            
+            // 2. On fait apparaître le site en dessous doucement
+            mainContent.style.opacity = '1';
+            
+            // 3. On remet le scroll pour que les invités puissent descendre sur le site
+            document.body.style.overflow = 'auto';
+            document.body.style.height = 'auto';
 
-            document.querySelectorAll('.fade-in').forEach((el) => {
-                observer.observe(el);
-            });
-        });
+            // 4. On supprime la porte après 2.5 secondes (pour ne pas qu'elle gêne les clics sur le site)
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 2500);
+        }
     </script>
 </body>
 </html>
