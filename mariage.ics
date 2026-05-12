@@ -1,0 +1,11 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Samia et Quincy//Mariage//FR
+BEGIN:VEVENT
+SUMMARY:Mariage de Samia & Quincy
+DTSTART;TZID=Europe/Paris:20260926T140000
+DTEND;TZID=Europe/Paris:20260927T040000
+LOCATION:Domaine du Château, 123 Route des Étoiles, 75000 Paris
+DESCRIPTION:Célébration du mariage religieux de Samia et Quincy !
+END:VEVENT
+END:VCALENDAR
