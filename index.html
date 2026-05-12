@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Invitation | Samia & Quincy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-color: #FAF8F5;
-            --text-dark: #2C2C2C;
-            --gold: #C5A880;
+            --bg-color: #FCFAEF; /* Crème très clair, comme dans la vidéo */
+            --text-dark: #333333;
+            --text-light: #777777;
+            --gold: #C2A878; /* Doré doux */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -19,15 +20,17 @@
             font-family: 'Montserrat', sans-serif; 
             background-color: var(--bg-color); 
             color: var(--text-dark); 
-            /* Empêche de scroller tant que la porte est fermée */
-            overflow: hidden; 
+            overflow: hidden; /* Bloque le défilement au début */
             height: 100vh;
         }
 
-        h1, h2, h3, .serif-text { font-family: 'Playfair Display', serif; font-weight: 400; }
+        h1, h2, h3, .serif-text { 
+            font-family: 'Playfair Display', serif; 
+            font-weight: 400; 
+        }
 
         /* =========================================
-           L'EFFET "PORTE QUI S'OUVRE"
+           1. L'EFFET PORTE (IDENTIQUE À LA VIDÉO)
            ========================================= */
         #door-overlay {
             position: fixed;
@@ -35,129 +38,197 @@
             width: 100vw; height: 100vh;
             z-index: 9999;
             display: flex;
-            /* La perspective est cruciale pour l'effet 3D des portes qui s'ouvrent vers nous */
-            perspective: 1200px; 
+            perspective: 1200px;
             background-color: #000;
         }
 
         .door-panel {
             width: 50%;
             height: 100%;
-            /* J'ai mis une belle photo de porte sculptée type Haussmannien/Château */
-            background-image: url('https://images.unsplash.com/photo-1541198687258-c51d6db796e0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
-            /* L'astuce : on met la taille du fond à 200% pour que la photo prenne tout l'écran */
+            /* Une belle porte claire classique */
+            background-image: url('https://images.unsplash.com/photo-1510018572596-a4039ec9bb28?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
             background-size: 200vw 100vh;
             background-repeat: no-repeat;
-            transition: transform 2.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transition: transform 2s cubic-bezier(0.645, 0.045, 0.355, 1);
             position: relative;
         }
 
-        /* La porte gauche affiche la moitié gauche de l'image et pivote sur son bord gauche */
         .left-door {
             background-position: left center;
             transform-origin: left center;
-            border-right: 2px solid rgba(0,0,0,0.3); /* Pour marquer la fente au milieu */
+            border-right: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* La porte droite affiche la moitié droite de l'image et pivote sur son bord droit */
         .right-door {
             background-position: right center;
             transform-origin: right center;
-            border-left: 2px solid rgba(0,0,0,0.3);
+            border-left: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* Le texte d'instruction sur la porte */
-        .door-instruction {
+        /* Le petit bouton "Appuyez pour ouvrir" */
+        .door-btn {
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            color: #fff;
-            text-align: center;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(5px);
+            color: #555;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
             z-index: 10000;
-            pointer-events: none; /* Pour que le clic passe à travers et touche la porte */
-            text-shadow: 0px 2px 10px rgba(0,0,0,0.8);
-            transition: opacity 0.5s ease;
-        }
-
-        .door-instruction p {
-            font-size: 1.2rem;
-            letter-spacing: 2px;
-            font-family: 'Playfair Display', serif;
-            font-style: italic;
-        }
-
-        .door-instruction span {
-            display: block;
-            margin-top: 10px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
             animation: pulse 2s infinite;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 1; }
-            100% { opacity: 0.5; }
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
+            100% { transform: translate(-50%, -50%) scale(1); }
         }
 
-        /* Classes ajoutées en Javascript quand on clique */
-        #door-overlay.open .left-door {
-            transform: rotateY(-110deg); /* S'ouvre vers la gauche */
-        }
-        
-        #door-overlay.open .right-door {
-            transform: rotateY(110deg); /* S'ouvre vers la droite */
-        }
-
-        #door-overlay.open .door-instruction {
-            opacity: 0; /* Le texte disparaît */
-        }
+        #door-overlay.open .left-door { transform: rotateY(-110deg); }
+        #door-overlay.open .right-door { transform: rotateY(110deg); }
+        #door-overlay.open .door-btn { opacity: 0; transition: 0.3s; }
 
         /* =========================================
-           LE CONTENU DU SITE (EN DESSOUS)
+           2. LE SITE (STYLE LUMINEUX & ROMANTIQUE)
            ========================================= */
         #main-content {
             opacity: 0;
-            transition: opacity 2s ease-in;
-            padding-bottom: 50px;
-        }
-
-        .hero {
-            height: 60vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            transition: opacity 1.5s ease-in;
+            padding-bottom: 80px;
             text-align: center;
-            padding: 20px;
         }
 
-        .hero-title {
-            font-size: clamp(3rem, 12vw, 5rem);
-            line-height: 1.1;
-            margin-bottom: 20px;
+        section { padding: 50px 20px; }
+        
+        .section-title {
+            font-size: 1.8rem;
             color: var(--text-dark);
+            margin-bottom: 30px;
+            letter-spacing: 1px;
         }
 
-        .hero-date {
-            font-size: 0.9rem;
+        .divider {
+            color: var(--gold);
+            font-size: 1.2rem;
+            margin: 20px 0;
+        }
+
+        /* HERO SECTION */
+        .hero-img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 0 0 20px 20px;
+            /* Image de couple romantique en attendant la vôtre */
+            background: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80') center/cover;
+        }
+
+        .couple-names {
+            font-size: 3rem;
+            color: var(--gold);
+            margin: 20px 0 10px 0;
+        }
+
+        .date-box { margin-top: 20px; }
+        .date-box h3 { font-size: 1.2rem; margin-bottom: 5px; }
+        .date-box p { font-size: 1.5rem; color: var(--gold); letter-spacing: 2px; }
+
+        /* BOUTONS STYLE APPLE/ANDROID */
+        .btn-outline {
+            display: inline-block;
+            padding: 12px 20px;
+            border: 1px solid var(--text-light);
+            border-radius: 25px;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 4px;
+            letter-spacing: 1px;
+            margin: 5px;
+            background: transparent;
+        }
+
+        /* COMPTE À REBOURS */
+        .countdown-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .time-box { text-align: center; }
+        .time-box span { font-size: 2rem; font-family: 'Playfair Display', serif; color: var(--gold); display: block; }
+        .time-box p { font-size: 0.7rem; text-transform: uppercase; color: var(--text-light); }
+
+        /* LIEU */
+        .map-img {
+            width: 100%;
+            height: 200px;
+            border-radius: 15px;
+            background: url('https://images.unsplash.com/photo-1523438885200-e635ba2c371e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80') center/cover;
+            margin-bottom: 15px;
+        }
+
+        /* PROGRAMME */
+        .program-list { text-align: left; max-width: 400px; margin: 0 auto; }
+        .program-item {
+            display: flex;
+            margin-bottom: 25px;
+        }
+        .program-time {
+            font-weight: 500;
+            margin-right: 20px;
             color: var(--gold);
         }
+        .program-detail h4 { font-size: 1rem; margin-bottom: 3px; }
+        .program-detail p { font-size: 0.85rem; color: var(--text-light); }
 
-        section { padding: 40px 20px; text-align: center; }
-        .section-title { font-size: 2rem; margin-bottom: 30px; }
-        .intro-text { font-size: 1.1rem; line-height: 1.8; color: #555; }
+        /* MENU */
+        .menu-section { background-color: #fff; border-radius: 15px; padding: 40px 20px; margin: 0 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        .menu-course { margin-bottom: 30px; }
+        .menu-course h4 { font-size: 1rem; text-transform: uppercase; color: var(--gold); letter-spacing: 2px; margin-bottom: 15px; }
+        .menu-course p { font-size: 0.9rem; margin-bottom: 8px; font-style: italic; }
 
-        /* Timeline simplifiée */
-        .timeline-item { margin-bottom: 40px; }
-        .time { font-size: 2.5rem; color: var(--gold); display: block; margin-bottom: 5px; }
-        .event-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
-        .event-desc { font-size: 0.95rem; color: #666; }
-
+        /* RSVP FORM */
+        .form-group { margin-bottom: 20px; text-align: left; }
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-bottom: 1px solid var(--text-light);
+            background: transparent;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .radio-group { display: flex; gap: 10px; margin-top: 10px; }
+        .radio-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--text-light);
+            border-radius: 25px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+        .btn-submit {
+            background-color: var(--text-dark);
+            color: #fff;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -165,48 +236,145 @@
     <div id="door-overlay" onclick="openInvitation()">
         <div class="door-panel left-door"></div>
         <div class="door-panel right-door"></div>
-        
-        <div class="door-instruction" id="instruction-text">
-            <p>S & Q</p>
-            <span>Appuyez pour ouvrir l'invitation</span>
-        </div>
+        <div class="door-btn">Appuyez pour ouvrir l'invitation</div>
     </div>
 
     <div id="main-content">
-        <header class="hero">
-            <span class="hero-date">26 Septembre 2026</span>
-            <h1 class="hero-title serif-text">Samia<br>&<br>Quincy</h1>
-        </header>
+        
+        <div class="hero-img"></div>
+        <section>
+            <p style="font-style: italic; color: var(--text-light);">Un simple "oui" change tout</p>
+            <h1 class="couple-names">Samia & Quincy</h1>
+            <p style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">Vous invitent à célébrer leur mariage</p>
+            
+            <div class="date-box">
+                <h3 class="serif-text">Samedi 26 Septembre</h3>
+                <p class="serif-text">2026</p>
+            </div>
+
+            <div style="margin-top: 25px;">
+                <p style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Notez cette date</p>
+                <a href="#" class="btn-outline">📅 Calendrier Apple</a>
+                <a href="#" class="btn-outline">📅 Calendrier Google</a>
+            </div>
+        </section>
+
+        <div class="divider">♡</div>
 
         <section>
-            <h2 class="section-title serif-text">L'Invitation</h2>
-            <p class="intro-text">
-                "Deux âmes, un seul cœur."<br><br>
-                Nous avons l'immense joie de vous convier à la célébration de notre mariage religieux au Domaine du Château.
-            </p>
+            <p style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">L'attente touche à sa fin</p>
+            <div class="countdown-container">
+                <div class="time-box"><span>120</span><p>Jours</p></div>
+                <div class="time-box"><span>14</span><p>Heures</p></div>
+                <div class="time-box"><span>30</span><p>Min</p></div>
+            </div>
+        </section>
+
+        <div class="divider">♡</div>
+
+        <section>
+            <p style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Lieu de la cérémonie</p>
+            <h2 class="serif-text" style="font-size: 2rem; color: var(--gold); margin-bottom: 10px;">Domaine du Château</h2>
+            <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 20px;">123 Route des Étoiles<br>75000 Paris</p>
+            <div class="map-img"></div>
+            <a href="#" class="btn-outline">📍 Voir sur Google Maps</a>
         </section>
 
         <section>
             <h2 class="section-title serif-text">Le Programme</h2>
-            
-            <div class="timeline-item">
-                <span class="time serif-text">14h00</span>
-                <div class="event-title">Cérémonie</div>
-                <div class="event-desc">Début de la célébration solennelle.</div>
-            </div>
-
-            <div class="timeline-item">
-                <span class="time serif-text">16h30</span>
-                <div class="event-title">Vin d'Honneur</div>
-                <div class="event-desc">Rafraîchissements dans les jardins.</div>
-            </div>
-
-            <div class="timeline-item">
-                <span class="time serif-text">19h30</span>
-                <div class="event-title">Repas de Noces</div>
-                <div class="event-desc">Dîner festif dans la grande salle.</div>
+            <div class="program-list">
+                <div class="program-item">
+                    <div class="program-time">14h00</div>
+                    <div class="program-detail">
+                        <h4>Accueil des invités</h4>
+                        <p>Arrivée et installation.</p>
+                    </div>
+                </div>
+                <div class="program-item">
+                    <div class="program-time">14h30</div>
+                    <div class="program-detail">
+                        <h4>Cérémonie Religieuse</h4>
+                        <p>Échange des vœux et des alliances.</p>
+                    </div>
+                </div>
+                <div class="program-item">
+                    <div class="program-time">16h30</div>
+                    <div class="program-detail">
+                        <h4>Vin d'honneur</h4>
+                        <p>Cocktail, animations et photos.</p>
+                    </div>
+                </div>
+                <div class="program-item">
+                    <div class="program-time">19h30</div>
+                    <div class="program-detail">
+                        <h4>Dîner</h4>
+                        <p>Ouverture de la salle et repas.</p>
+                    </div>
+                </div>
             </div>
         </section>
+
+        <section class="menu-section">
+            <div class="divider" style="margin-top: 0;">🍴</div>
+            <h2 class="section-title serif-text">Menu du Dîner</h2>
+            
+            <div class="menu-course">
+                <h4>Cocktail</h4>
+                <p>Champagne Brut & Cocktails</p>
+                <p>Assortiment de pièces montées salées</p>
+                <p>Atelier culinaire</p>
+            </div>
+            
+            <div class="menu-course">
+                <h4>Entrée</h4>
+                <p>Option 1: Carpaccio de Saint-Jacques</p>
+                <p>Option 2: Foie gras mi-cuit, chutney de figues</p>
+            </div>
+            
+            <div class="menu-course">
+                <h4>Plat</h4>
+                <p>Filet de bœuf rôti, jus réduit au thym</p>
+                <p>Purée truffée & légumes de saison</p>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="section-title serif-text">Code Vestimentaire</h2>
+            <h3 class="serif-text" style="font-size: 1.5rem; color: var(--gold); margin-bottom: 20px;">Tenue Élégante</h3>
+            <p style="font-size: 0.9rem; margin-bottom: 10px;"><strong>Messieurs :</strong> Costume sombre ou bleu marine.</p>
+            <p style="font-size: 0.9rem;"><strong>Mesdames :</strong> Robe longue ou midi, couleurs douces.</p>
+        </section>
+
+        <section style="background-color: #fff; padding: 50px 20px;">
+            <div class="divider" style="margin-top: 0;">💌</div>
+            <h2 class="serif-text" style="font-size: 1.8rem; margin-bottom: 10px;">Votre réponse compte pour nous.</h2>
+            <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 30px;">Merci de confirmer avant le 1er Mai 2026.</p>
+            
+            <form>
+                <div class="form-group">
+                    <input type="text" placeholder="Nom et Prénom complet">
+                </div>
+                
+                <div class="form-group">
+                    <p style="font-size: 0.85rem; margin-bottom: 5px; font-weight: 500;">Serez-vous des nôtres ?</p>
+                    <div class="radio-group">
+                        <div class="radio-btn" style="background: var(--gold); color: #fff; border-color: var(--gold);">Oui, avec joie !</div>
+                        <div class="radio-btn">Hélas, non</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" placeholder="Serez-vous accompagné(e) ? (Précisez)">
+                </div>
+
+                <div class="form-group">
+                    <input type="text" placeholder="Avez-vous des allergies alimentaires ?">
+                </div>
+
+                <button type="button" class="btn-submit">Confirmer ma présence</button>
+            </form>
+        </section>
+
     </div>
 
     <script>
@@ -214,20 +382,15 @@
             const overlay = document.getElementById('door-overlay');
             const mainContent = document.getElementById('main-content');
             
-            // 1. On lance l'animation d'ouverture 3D
             overlay.classList.add('open');
-            
-            // 2. On fait apparaître le site en dessous doucement
             mainContent.style.opacity = '1';
             
-            // 3. On remet le scroll pour que les invités puissent descendre sur le site
             document.body.style.overflow = 'auto';
             document.body.style.height = 'auto';
 
-            // 4. On supprime la porte après 2.5 secondes (pour ne pas qu'elle gêne les clics sur le site)
             setTimeout(() => {
                 overlay.style.display = 'none';
-            }, 2500);
+            }, 2000);
         }
     </script>
 </body>
