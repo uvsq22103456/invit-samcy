@@ -8,10 +8,10 @@
     
     <style>
         :root {
-            --bg-color: #FCFAEF; /* Crème très clair, comme dans la vidéo */
+            --bg-color: #FCFAEF;
             --text-dark: #333333;
             --text-light: #777777;
-            --gold: #C2A878; /* Doré doux */
+            --gold: #C2A878;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -20,67 +20,76 @@
             font-family: 'Montserrat', sans-serif; 
             background-color: var(--bg-color); 
             color: var(--text-dark); 
-            overflow: hidden; /* Bloque le défilement au début */
+            overflow: hidden; 
             height: 100vh;
         }
 
-        h1, h2, h3, .serif-text { 
-            font-family: 'Playfair Display', serif; 
-            font-weight: 400; 
-        }
+        h1, h2, h3, .serif-text { font-family: 'Playfair Display', serif; font-weight: 400; }
 
         /* =========================================
-           1. L'EFFET PORTE (IDENTIQUE À LA VIDÉO)
+           1. L'EFFET PORTE (FAÇADE FIXE + PORTES 3D)
            ========================================= */
         #door-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            z-index: 9999;
-            display: flex;
-            perspective: 1200px;
-            background-color: #000;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: 9999; background-color: var(--bg-color);
         }
 
-                .door-panel {
-            width: 50%;
-            height: 100%;
-            /* Lien mis à jour avec ton image : */
-            background-image: url('Porti.jpg');
-            background-size: 100vw 100vh;
+        /* Dès que c'est ouvert, tout l'overlay disparaît doucement après 1.5s */
+        #door-overlay.open {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease 1.5s; 
+        }
+
+        /* COUCHE DU DESSUS : La façade avec le trou transparent */
+        .facade-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('facade.png'); /* Ton image de façade */
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: 10;
+            pointer-events: none; /* Laisse le clic toucher les portes en dessous */
+        }
+
+        /* COUCHE DU DESSOUS : Le conteneur des portes */
+        .door-wrapper {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            perspective: 1200px;
+            z-index: 5;
+        }
+
+        /* Les deux moitiés de porte */
+        .door-panel {
+            width: 50%; height: 100%;
+            background-size: 100% 100%;
             background-repeat: no-repeat;
             transition: transform 2s cubic-bezier(0.645, 0.045, 0.355, 1);
-            position: relative;
         }
 
         .left-door {
-            background-position: left center;
+            background-image: url('porte-gauche.png'); /* Ton image porte gauche */
             transform-origin: left center;
-            border-right: 1px solid rgba(0,0,0,0.1);
         }
 
         .right-door {
-            background-position: right center;
+            background-image: url('porte-droite.png'); /* Ton image porte droite */
             transform-origin: right center;
-            border-left: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* Le petit bouton "Appuyez pour ouvrir" */
+        /* L'animation : seules les portes tournent ! */
+        #door-overlay.open .left-door { transform: rotateY(-110deg); }
+        #door-overlay.open .right-door { transform: rotateY(110deg); }
+
+        /* Le petit bouton clignotant */
         .door-btn {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(5px);
-            color: #555;
-            padding: 12px 25px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            z-index: 10000;
-            cursor: pointer;
-            animation: pulse 2s infinite;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px);
+            color: #555; padding: 12px 25px; border-radius: 30px;
+            font-size: 0.85rem; letter-spacing: 1px;
+            z-index: 20; cursor: pointer;
+            animation: pulse 2s infinite; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         @keyframes pulse {
@@ -89,153 +98,67 @@
             100% { transform: translate(-50%, -50%) scale(1); }
         }
 
-        #door-overlay.open .left-door { transform: rotateY(-110deg); }
-        #door-overlay.open .right-door { transform: rotateY(110deg); }
         #door-overlay.open .door-btn { opacity: 0; transition: 0.3s; }
 
         /* =========================================
-           2. LE SITE (STYLE LUMINEUX & ROMANTIQUE)
+           2. LE SITE (IDENTIQUE À AVANT)
            ========================================= */
-        #main-content {
-            opacity: 0;
-            transition: opacity 1.5s ease-in;
-            padding-bottom: 80px;
-            text-align: center;
-        }
-
+        #main-content { opacity: 0; transition: opacity 1.5s ease-in; padding-bottom: 80px; text-align: center; }
         section { padding: 50px 20px; }
-        
-        .section-title {
-            font-size: 1.8rem;
-            color: var(--text-dark);
-            margin-bottom: 30px;
-            letter-spacing: 1px;
-        }
+        .section-title { font-size: 1.8rem; color: var(--text-dark); margin-bottom: 30px; letter-spacing: 1px; }
+        .divider { color: var(--gold); font-size: 1.2rem; margin: 20px 0; }
 
-        .divider {
-            color: var(--gold);
-            font-size: 1.2rem;
-            margin: 20px 0;
-        }
-
-        /* HERO SECTION */
         .hero-img {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-            border-radius: 0 0 20px 20px;
-            /* Image de couple romantique en attendant la vôtre */
+            width: 100%; height: 350px; object-fit: cover; border-radius: 0 0 20px 20px;
             background: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80') center/cover;
         }
-
-        .couple-names {
-            font-size: 3rem;
-            color: var(--gold);
-            margin: 20px 0 10px 0;
-        }
-
+        .couple-names { font-size: 3rem; color: var(--gold); margin: 20px 0 10px 0; }
         .date-box { margin-top: 20px; }
         .date-box h3 { font-size: 1.2rem; margin-bottom: 5px; }
         .date-box p { font-size: 1.5rem; color: var(--gold); letter-spacing: 2px; }
 
-        /* BOUTONS STYLE APPLE/ANDROID */
         .btn-outline {
-            display: inline-block;
-            padding: 12px 20px;
-            border: 1px solid var(--text-light);
-            border-radius: 25px;
-            color: var(--text-dark);
-            text-decoration: none;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 5px;
-            background: transparent;
+            display: inline-block; padding: 12px 20px; border: 1px solid var(--text-light);
+            border-radius: 25px; color: var(--text-dark); text-decoration: none;
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin: 5px; background: transparent;
         }
 
-        /* COMPTE À REBOURS */
-        .countdown-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-        }
+        .countdown-container { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
         .time-box { text-align: center; }
         .time-box span { font-size: 2rem; font-family: 'Playfair Display', serif; color: var(--gold); display: block; }
         .time-box p { font-size: 0.7rem; text-transform: uppercase; color: var(--text-light); }
 
-        /* LIEU */
         .map-img {
-            width: 100%;
-            height: 200px;
-            border-radius: 15px;
+            width: 100%; height: 200px; border-radius: 15px; margin-bottom: 15px;
             background: url('https://images.unsplash.com/photo-1523438885200-e635ba2c371e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80') center/cover;
-            margin-bottom: 15px;
         }
 
-        /* PROGRAMME */
         .program-list { text-align: left; max-width: 400px; margin: 0 auto; }
-        .program-item {
-            display: flex;
-            margin-bottom: 25px;
-        }
-        .program-time {
-            font-weight: 500;
-            margin-right: 20px;
-            color: var(--gold);
-        }
+        .program-item { display: flex; margin-bottom: 25px; }
+        .program-time { font-weight: 500; margin-right: 20px; color: var(--gold); }
         .program-detail h4 { font-size: 1rem; margin-bottom: 3px; }
         .program-detail p { font-size: 0.85rem; color: var(--text-light); }
 
-        /* MENU */
         .menu-section { background-color: #fff; border-radius: 15px; padding: 40px 20px; margin: 0 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
         .menu-course { margin-bottom: 30px; }
         .menu-course h4 { font-size: 1rem; text-transform: uppercase; color: var(--gold); letter-spacing: 2px; margin-bottom: 15px; }
         .menu-course p { font-size: 0.9rem; margin-bottom: 8px; font-style: italic; }
 
-        /* RSVP FORM */
-        .form-group { margin-bottom: 20px; text-align: left; }
-        input[type="text"] {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-bottom: 1px solid var(--text-light);
-            background: transparent;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1rem;
-            outline: none;
-        }
-        
-        .radio-group { display: flex; gap: 10px; margin-top: 10px; }
-        .radio-btn {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid var(--text-light);
-            border-radius: 25px;
-            text-align: center;
-            font-size: 0.85rem;
-            color: var(--text-dark);
-            cursor: pointer;
-        }
         .btn-submit {
-            background-color: var(--text-dark);
-            color: #fff;
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 20px;
+            background-color: var(--text-dark); color: #fff; width: 100%; padding: 15px;
+            border: none; border-radius: 25px; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
     <div id="door-overlay" onclick="openInvitation()">
-        <div class="door-panel left-door"></div>
-        <div class="door-panel right-door"></div>
+        <div class="door-wrapper">
+            <div class="door-panel left-door"></div>
+            <div class="door-panel right-door"></div>
+        </div>
+        <div class="facade-overlay"></div>
+        
         <div class="door-btn">Appuyez pour ouvrir l'invitation</div>
     </div>
 
@@ -253,9 +176,8 @@
             </div>
 
             <div style="margin-top: 25px;">
-                <p style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">Notez cette date</p>
                 <a href="mariage.ics" class="btn-outline">📅 Calendrier Apple</a>
-                <a href="https://www.google.com/calendar/render?action=TEMPLATE&text=Mariage+Samia%2FQuincy&location=Paris&dates=20261111T205100Z%2F20261111T205100Z" class="btn-outline">📅 Calendrier Google</a>
+                <a href="#" class="btn-outline">📅 Calendrier Google</a>
             </div>
         </section>
 
@@ -277,7 +199,7 @@
             <h2 class="serif-text" style="font-size: 2rem; color: var(--gold); margin-bottom: 10px;">Domaine du Château</h2>
             <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 20px;">123 Route des Étoiles<br>75000 Paris</p>
             <div class="map-img"></div>
-            <a href="https://maps.app.goo.gl/KUviK8HRnTcviMm69" class="btn-outline">📍 Voir sur Google Maps</a>
+            <a href="#" class="btn-outline">📍 Voir sur Google Maps</a>
         </section>
 
         <section>
@@ -350,7 +272,7 @@
             <h2 class="serif-text" style="font-size: 1.8rem; margin-bottom: 10px;">Votre réponse compte pour nous.</h2>
             <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 30px;">Merci de confirmer avant le 1er Mai 2026.</p>
             
-           <a href="https://docs.google.com/forms/d/e/1FAIpQLScch0vJuzjJt0vIQQucVMWa_HbLeN7feAC3A5z6WQbBwhRWXg/viewform?usp=dialog" target="_blank" class="btn-submit" style="text-decoration:none; display:inline-block; text-align:center;">
+            <a href="TON_LIEN_GOOGLE_FORM_ICI" target="_blank" class="btn-submit" style="text-decoration:none; display:inline-block; text-align:center;">
                 Confirmer ma présence
             </a>
         </section>
@@ -368,9 +290,7 @@
             document.body.style.overflow = 'auto';
             document.body.style.height = 'auto';
 
-            setTimeout(() => {
-                overlay.style.display = 'none';
-            }, 2000);
+            // Plus besoin du timeout pour supprimer la porte, le CSS le cache tout seul proprement !
         }
     </script>
 </body>
