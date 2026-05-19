@@ -27,78 +27,42 @@
         h1, h2, h3, .serif-text { font-family: 'Playfair Display', serif; font-weight: 400; }
 
         /* =========================================
-           1. L'EFFET PORTE (FAÇADE FIXE + PORTES 3D)
+           1. L'EFFET VIDÉO (RIDEAUX)
            ========================================= */
         #door-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             z-index: 9999; background-color: var(--bg-color);
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 1s ease; /* Fondu à la fin de la vidéo */
         }
 
-        /* Dès que c'est ouvert, tout l'overlay disparaît doucement après 1.5s */
         #door-overlay.open {
             opacity: 0;
             pointer-events: none;
-            transition: opacity 1s ease 1.5s; 
         }
 
-        /* COUCHE DU DESSUS : La façade avec le trou transparent */
-        .facade-overlay {
+        #intro-video {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('facade.png'); /* Ton image de façade */
-            background-size: 100% 100%;
-            background-position: center;
-            background-repeat: no-repeat;
-            z-index: 10;
-            pointer-events: none; /* Laisse le clic toucher les portes en dessous */
-        }
-
-        /* COUCHE DU DESSOUS : Le conteneur des portes */
-        .door-wrapper {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            perspective: 1200px;
+            object-fit: cover; /* Assure que la vidéo couvre tout l'écran sans se déformer */
             z-index: 5;
         }
 
-        /* Les deux moitiés de porte */
-        .door-panel {
-            width: 50%; height: 100%;
-            background-size: 100% 100%;
-            background-repeat: no-repeat;
-            transition: transform 2s cubic-bezier(0.645, 0.045, 0.355, 1);
-        }
-
-        .left-door {
-            background-image: url('porte-gauche.png'); /* Ton image porte gauche */
-            transform-origin: left center;
-        }
-
-        .right-door {
-            background-image: url('porte-droite.png'); /* Ton image porte droite */
-            transform-origin: right center;
-        }
-
-        /* L'animation : seules les portes tournent ! */
-        #door-overlay.open .left-door { transform: rotateY(-110deg); }
-        #door-overlay.open .right-door { transform: rotateY(110deg); }
-
         /* Le petit bouton clignotant */
         .door-btn {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            position: relative; /* Modifié par rapport à absolute pour centrer via Flexbox */
             background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px);
             color: #555; padding: 12px 25px; border-radius: 30px;
             font-size: 0.85rem; letter-spacing: 1px;
             z-index: 20; cursor: pointer;
             animation: pulse 2s infinite; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: opacity 0.5s ease;
         }
 
         @keyframes pulse {
-            0% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.05); }
-            100% { transform: translate(-50%, -50%) scale(1); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
-
-        #door-overlay.open .door-btn { opacity: 0; transition: 0.3s; }
 
         /* =========================================
            2. LE SITE (IDENTIQUE À AVANT)
@@ -152,14 +116,11 @@
 </head>
 <body>
 
-    <div id="door-overlay" onclick="openInvitation()">
-        <div class="door-wrapper">
-            <div class="door-panel left-door"></div>
-            <div class="door-panel right-door"></div>
-        </div>
-        <div class="facade-overlay"></div>
-        
-        <div class="door-btn">Appuyez pour ouvrir l'invitation</div>
+    <div id="door-overlay">
+        <video id="intro-video" playsinline muted>
+            <source src="gemini_generated_video_77066EC3.mp4" type="video/mp4">
+        </video>
+        <div class="door-btn" onclick="openInvitation()">Appuyez pour ouvrir l'invitation</div>
     </div>
 
     <div id="main-content">
@@ -283,14 +244,25 @@
         function openInvitation() {
             const overlay = document.getElementById('door-overlay');
             const mainContent = document.getElementById('main-content');
+            const video = document.getElementById('intro-video');
+            const btn = document.querySelector('.door-btn');
             
-            overlay.classList.add('open');
-            mainContent.style.opacity = '1';
+            // 1. On cache le bouton
+            btn.style.opacity = '0';
+            btn.style.pointerEvents = 'none'; // Empêche de recliquer dessus
             
-            document.body.style.overflow = 'auto';
-            document.body.style.height = 'auto';
-
-            // Plus besoin du timeout pour supprimer la porte, le CSS le cache tout seul proprement !
+            // 2. On lance la vidéo
+            video.play();
+            
+            // 3. Quand la vidéo se termine, on dévoile le site
+            video.onended = function() {
+                overlay.classList.add('open');
+                mainContent.style.opacity = '1';
+                
+                // On réactive le défilement de la page
+                document.body.style.overflow = 'auto';
+                document.body.style.height = 'auto';
+            };
         }
     </script>
 </body>
