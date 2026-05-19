@@ -43,13 +43,14 @@
 
         #intro-video {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: cover; /* Assure que la vidéo couvre tout l'écran sans se déformer */
+            object-fit: cover; /* Remplit l'écran */
+            object-position: center center; /* FORCE LE CENTRAGE DU RIDEAU */
             z-index: 5;
         }
 
         /* Le petit bouton clignotant */
         .door-btn {
-            position: relative; /* Modifié par rapport à absolute pour centrer via Flexbox */
+            position: relative;
             background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(5px);
             color: #555; padding: 12px 25px; border-radius: 30px;
             font-size: 0.85rem; letter-spacing: 1px;
@@ -117,8 +118,8 @@
 <body>
 
     <div id="door-overlay">
-        <video id="intro-video" playsinline muted>
-            <source src="gemini_generated_video_77066EC3.mp4" type="video/mp4">
+        <video id="intro-video" playsinline muted preload="auto">
+            <source src="gemini_generated_video_77066EC3.mp4#t=0.1" type="video/mp4">
         </video>
         <div class="door-btn" onclick="openInvitation()">Appuyez pour ouvrir l'invitation</div>
     </div>
