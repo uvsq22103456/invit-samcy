@@ -43,7 +43,7 @@
 
         #intro-video {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            /*object-fit: cover; /* Remplit l'écran */
+            object-fit: cover; /* Remplit l'écran */
             object-position: center center; /* FORCE LE CENTRAGE DU RIDEAU */
             z-index: 5;
         }
@@ -152,9 +152,9 @@
         <section>
             <p style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">L'attente touche à sa fin</p>
             <div class="countdown-container">
-                <div class="time-box"><span>120</span><p>Jours</p></div>
-                <div class="time-box"><span>14</span><p>Heures</p></div>
-                <div class="time-box"><span>30</span><p>Min</p></div>
+                <div class="time-box"><span id="days">0</span><p>Jours</p></div>
+                <div class="time-box"><span id="hours">0</span><p>Heures</p></div>
+                <div class="time-box"><span id="minutes">0</span><p>Min</p></div>
             </div>
         </section>
 
@@ -246,6 +246,34 @@
     </div>
 
     <script>
+
+        // =========================================
+        // 1. LE COMPTEUR (Démarre dès le chargement)
+        // =========================================
+        const countDownDate = new Date("Nov 11, 2026 11:30:00").getTime();
+
+        const x = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+            // Met à jour les chiffres si les éléments existent
+            if(document.getElementById("days")) {
+                document.getElementById("days").innerHTML = days;
+                document.getElementById("hours").innerHTML = hours;
+                document.getElementById("minutes").innerHTML = minutes;
+            }
+
+            if (distance < 0) {
+                clearInterval(x);
+                if(document.querySelector(".countdown-container")) {
+                    document.querySelector(".countdown-container").innerHTML = "<p style='font-size: 1.5rem; font-family: Playfair Display, serif; color: var(--gold);'>C'est le grand jour ! 🎉</p>";
+                }
+            }
+        }, 1000);
         function openInvitation() {
             const overlay = document.getElementById('door-overlay');
             const mainContent = document.getElementById('main-content');
@@ -267,6 +295,7 @@
                 // On réactive le défilement de la page
                 document.body.style.overflow = 'auto';
                 document.body.style.height = 'auto';
+                
             };
         }
     </script>
